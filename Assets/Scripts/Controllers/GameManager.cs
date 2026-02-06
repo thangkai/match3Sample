@@ -53,6 +53,8 @@ public class GameManager : MonoBehaviour
 
         m_uiMenu = FindObjectOfType<UIMainManager>();
         m_uiMenu.Setup(this);
+
+        this.gameObject.AddComponent<ItemFactory>();
     }
 
     void Start()
@@ -89,12 +91,12 @@ public class GameManager : MonoBehaviour
         if (mode == eLevelMode.MOVES)
         {
             m_levelCondition = this.gameObject.AddComponent<LevelMoves>();
-            m_levelCondition.Setup(m_gameSettings.LevelMoves, m_uiMenu.GetLevelConditionView(), m_boardController);
+            m_levelCondition.Setup(m_gameSettings.LevelMoves, m_uiMenu.GetLevelConditionUpdater(), m_boardController);
         }
         else if (mode == eLevelMode.TIMER)
         {
             m_levelCondition = this.gameObject.AddComponent<LevelTime>();
-            m_levelCondition.Setup(m_gameSettings.LevelMoves, m_uiMenu.GetLevelConditionView(), this);
+            m_levelCondition.Setup(m_gameSettings.LevelMoves, m_uiMenu.GetLevelConditionUpdater(), this);
         }
 
         m_levelCondition.ConditionCompleteEvent += GameOver;
@@ -102,7 +104,7 @@ public class GameManager : MonoBehaviour
         State = eStateGame.GAME_STARTED;
     }
 
-    public void GameOver()
+    private void GameOver()
     {
         StartCoroutine(WaitBoardController());
     }

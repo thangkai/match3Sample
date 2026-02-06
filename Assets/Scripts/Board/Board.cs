@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+
 using UnityEngine;
 
 public class Board
@@ -79,7 +79,7 @@ public class Board
             for (int y = 0; y < boardSizeY; y++)
             {
                 Cell cell = m_cells[x, y];
-                NormalItem item = new NormalItem();
+
 
                 List<NormalItem.eNormalType> types = new List<NormalItem.eNormalType>();
                 if (cell.NeighbourBottom != null)
@@ -100,8 +100,9 @@ public class Board
                     }
                 }
 
-                item.SetType(Utils.GetRandomNormalTypeExcept(types.ToArray()));
-                item.SetView();
+                var type = Utils.GetRandomNormalTypeExcept(types.ToArray());
+                NormalItem item = ItemFactory.Instance.GetNormalItem(type);
+                item.SetType(type);
                 item.SetViewRoot(m_root);
 
                 cell.Assign(item);
@@ -145,10 +146,9 @@ public class Board
                 Cell cell = m_cells[x, y];
                 if (!cell.IsEmpty) continue;
 
-                NormalItem item = new NormalItem();
-
-                item.SetType(Utils.GetRandomNormalType());
-                item.SetView();
+                var type = Utils.GetRandomNormalType();
+                NormalItem item = ItemFactory.Instance.GetNormalItem(type);
+                item.SetType(type);
                 item.SetViewRoot(m_root);
 
                 cell.Assign(item);
@@ -260,30 +260,32 @@ public class Board
     {
         eMatchDirection dir = GetMatchDirection(matches);
 
-        BonusItem item = new BonusItem();
+        BonusItem.eBonusType bonusType = BonusItem.eBonusType.NONE;
         switch (dir)
         {
             case eMatchDirection.ALL:
-                item.SetType(BonusItem.eBonusType.ALL);
+                bonusType = BonusItem.eBonusType.ALL;
                 break;
             case eMatchDirection.HORIZONTAL:
-                item.SetType(BonusItem.eBonusType.HORIZONTAL);
+                bonusType = BonusItem.eBonusType.HORIZONTAL;
                 break;
             case eMatchDirection.VERTICAL:
-                item.SetType(BonusItem.eBonusType.VERTICAL);
+                bonusType = BonusItem.eBonusType.VERTICAL;
                 break;
         }
 
-        if (item != null)
+        if (bonusType != BonusItem.eBonusType.NONE)
         {
+            BonusItem item = ItemFactory.Instance.GetBonusItem(bonusType);
+            item.SetType(bonusType);
+
+            item.SetViewRoot(m_root);
+
             if (cellToConvert == null)
             {
                 int rnd = UnityEngine.Random.Range(0, matches.Count);
                 cellToConvert = matches[rnd];
             }
-
-            item.SetView();
-            item.SetViewRoot(m_root);
 
             cellToConvert.Free();
             cellToConvert.Assign(item);
@@ -296,14 +298,29 @@ public class Board
     {
         if (matches == null || matches.Count < m_matchMin) return eMatchDirection.NONE;
 
-        var listH = matches.Where(x => x.BoardX == matches[0].BoardX).ToList();
-        if (listH.Count == matches.Count)
+        bool allVertical = true;
+        bool allHorizontal = true;
+        int firstX = matches[0].BoardX;
+        int firstY = matches[0].BoardY;
+
+        for (int i = 1; i < matches.Count; i++)
+        {
+            if (matches[i].BoardX != firstX)
+            {
+                allVertical = false;
+            }
+            if (matches[i].BoardY != firstY)
+            {
+                allHorizontal = false;
+            }
+        }
+
+        if (allVertical)
         {
             return eMatchDirection.VERTICAL;
         }
 
-        var listV = matches.Where(x => x.BoardY == matches[0].BoardY).ToList();
-        if (listV.Count == matches.Count)
+        if (allHorizontal)
         {
             return eMatchDirection.HORIZONTAL;
         }
@@ -349,7 +366,16 @@ public class Board
     {
         var dir = GetMatchDirection(matches);
 
-        var bonus = matches.Where(x => x.Item is BonusItem).FirstOrDefault();
+        BonusItem bonus = null;
+        for (int i = 0; i < matches.Count; i++)
+        {
+            if (matches[i].Item is BonusItem)
+            {
+                bonus = matches[i].Item as BonusItem;
+                break; 
+            }
+        }
+        
         if(bonus == null)
         {
             return matches;
@@ -359,32 +385,32 @@ public class Board
         switch (dir)
         {
             case eMatchDirection.HORIZONTAL:
-                foreach (var cell in matches)
+                for (int i = 0; i < matches.Count; i++)
                 {
-                    BonusItem item = cell.Item as BonusItem;
+                    BonusItem item = matches[i].Item as BonusItem;
                     if (item == null || item.ItemType == BonusItem.eBonusType.HORIZONTAL)
                     {
-                        result.Add(cell);
+                        result.Add(matches[i]);
                     }
                 }
                 break;
             case eMatchDirection.VERTICAL:
-                foreach (var cell in matches)
+                for (int i = 0; i < matches.Count; i++)
                 {
-                    BonusItem item = cell.Item as BonusItem;
+                    BonusItem item = matches[i].Item as BonusItem;
                     if (item == null || item.ItemType == BonusItem.eBonusType.VERTICAL)
                     {
-                        result.Add(cell);
+                        result.Add(matches[i]);
                     }
                 }
                 break;
             case eMatchDirection.ALL:
-                foreach (var cell in matches)
+                for (int i = 0; i < matches.Count; i++)
                 {
-                    BonusItem item = cell.Item as BonusItem;
+                    BonusItem item = matches[i].Item as BonusItem;
                     if (item == null || item.ItemType == BonusItem.eBonusType.ALL)
                     {
-                        result.Add(cell);
+                        result.Add(matches[i]);
                     }
                 }
                 break;

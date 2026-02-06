@@ -10,9 +10,9 @@ public class LevelMoves : LevelCondition
 
     private BoardController m_board;
 
-    public override void Setup(float value, Text txt, BoardController board)
+    public override void Setup(float value, Action<string> onUpdateText, BoardController board)
     {
-        base.Setup(value, txt);
+        base.Setup(value, onUpdateText);
 
         m_moves = (int)value;
 
@@ -39,7 +39,7 @@ public class LevelMoves : LevelCondition
 
     protected override void UpdateText()
     {
-        m_txt.text = string.Format("MOVES:\n{0}", m_moves);
+        if(m_onUpdateText != null) m_onUpdateText(string.Format("MOVES:\n{0}", m_moves));
     }
 
     protected override void OnDestroy()

@@ -8,23 +8,23 @@ public class LevelCondition : MonoBehaviour
 {
     public event Action ConditionCompleteEvent = delegate { };
 
-    protected Text m_txt;
+    protected Action<string> m_onUpdateText;
 
     protected bool m_conditionCompleted = false;
 
-    public virtual void Setup(float value, Text txt)
+    public virtual void Setup(float value, Action<string> onUpdateText)
     {
-        m_txt = txt;
+        m_onUpdateText = onUpdateText;
     }
 
-    public virtual void Setup(float value, Text txt, GameManager mngr)
+    public virtual void Setup(float value, Action<string> onUpdateText, GameManager mngr)
     {
-        m_txt = txt;
+        m_onUpdateText = onUpdateText;
     }
 
-    public virtual void Setup(float value, Text txt, BoardController board)
+    public virtual void Setup(float value, Action<string> onUpdateText, BoardController board)
     {
-        m_txt = txt;
+        m_onUpdateText = onUpdateText;
     }
 
     protected virtual void UpdateText() { }

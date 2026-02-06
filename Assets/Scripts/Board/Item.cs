@@ -11,22 +11,12 @@ public class Item
 
     public Transform View { get; private set; }
 
+    public string PrefabPath { get; set; }
 
-    public virtual void SetView()
+    public virtual void SetView(Transform view)
     {
-        string prefabname = GetPrefabName();
-
-        if (!string.IsNullOrEmpty(prefabname))
-        {
-            GameObject prefab = Resources.Load<GameObject>(prefabname);
-            if (prefab)
-            {
-                View = GameObject.Instantiate(prefab).transform;
-            }
-        }
+        View = view;
     }
-
-    protected virtual string GetPrefabName() { return string.Empty; }
 
     public virtual void SetCell(Cell cell)
     {
@@ -84,7 +74,7 @@ public class Item
     {
         if (View == null) return;
 
-        Vector3 scale = View.localScale;
+        Vector3 scale = Vector3.one; // Assume default scale is one
         View.localScale = Vector3.one * 0.1f;
         View.DOScale(scale, 0.1f);
     }
@@ -101,20 +91,17 @@ public class Item
             View.DOScale(0.1f, 0.1f).OnComplete(
                 () =>
                 {
-                    GameObject.Destroy(View.gameObject);
-                    View = null;
+                    ItemFactory.Instance.ReturnItem(this);
                 }
                 );
         }
     }
 
-
-
     internal void AnimateForHint()
     {
         if (View)
         {
-            View.DOPunchScale(View.localScale * 0.1f, 0.1f).SetLoops(-1);
+            View.DOPunchScale(Vector3.one * 0.1f, 0.1f).SetLoops(-1);
         }
     }
 
@@ -123,17 +110,36 @@ public class Item
         if (View)
         {
             View.DOKill();
+            View.localScale = Vector3.one;
         }
     }
 
     internal void Clear()
     {
         Cell = null;
+        ItemFactory.Instance.ReturnItem(this);
+    }
 
+    public virtual void OnGetFromPool()
+    {
         if (View)
         {
-            GameObject.Destroy(View.gameObject);
-            View = null;
+            View.gameObject.SetActive(true);
+            View.localScale = Vector3.one;
+            View.DOKill();
+            
+            SpriteRenderer sp = View.GetComponent<SpriteRenderer>();
+            if (sp) sp.sortingOrder = 0;
         }
+    }
+
+    public virtual void OnReturnToPool()
+    {
+        if (View)
+        {
+            View.DOKill();
+            View.gameObject.SetActive(false);
+        }
+        Cell = null;
     }
 }

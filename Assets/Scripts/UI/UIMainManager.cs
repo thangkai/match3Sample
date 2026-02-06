@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,9 +11,21 @@ public class UIMainManager : MonoBehaviour
 
     private GameManager m_gameManager;
 
+    private UIPanelGame m_panelGame;
+
     private void Awake()
     {
         m_menuList = GetComponentsInChildren<IMenu>(true);
+        
+        // Cache known panels
+        for(int i=0; i<m_menuList.Length; ++i)
+        {
+            if(m_menuList[i] is UIPanelGame)
+            {
+                m_panelGame = m_menuList[i] as UIPanelGame;
+                break;
+            }
+        }
     }
 
     void Start()
@@ -88,12 +100,11 @@ public class UIMainManager : MonoBehaviour
         }
     }
 
-    internal Text GetLevelConditionView()
+    internal Action<string> GetLevelConditionUpdater()
     {
-        UIPanelGame game = m_menuList.Where(x => x is UIPanelGame).Cast<UIPanelGame>().FirstOrDefault();
-        if (game)
+        if (m_panelGame)
         {
-            return game.LevelConditionView;
+            return m_panelGame.SetLevelConditionText;
         }
 
         return null;

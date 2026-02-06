@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,9 +10,9 @@ public class LevelTime : LevelCondition
 
     private GameManager m_mngr;
 
-    public override void Setup(float value, Text txt, GameManager mngr)
+    public override void Setup(float value, Action<string> onUpdateText, GameManager mngr)
     {
-        base.Setup(value, txt, mngr);
+        base.Setup(value, onUpdateText, mngr);
 
         m_mngr = mngr;
 
@@ -40,6 +41,6 @@ public class LevelTime : LevelCondition
     {
         if (m_time < 0f) return;
 
-        m_txt.text = string.Format("TIME:\n{0:00}", m_time);
+        if (m_onUpdateText != null) m_onUpdateText(string.Format("TIME:\n{0:00}", m_time));
     }
 }

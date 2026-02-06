@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "GameSettings", menuName = "Match3/GameSettings")]
 public class GameSettings : ScriptableObject
 {
     public int BoardSizeX = 5;

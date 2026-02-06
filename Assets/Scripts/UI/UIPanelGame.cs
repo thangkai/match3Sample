@@ -6,11 +6,19 @@ using UnityEngine.UI;
 
 public class UIPanelGame : MonoBehaviour,IMenu
 {
-    public Text LevelConditionView;
+    [SerializeField] private Text LevelConditionView;
 
     [SerializeField] private Button btnPause;
 
     private UIMainManager m_mngr;
+
+    internal void SetLevelConditionText(string content)
+    {
+        if (LevelConditionView)
+        {
+            LevelConditionView.text = content;
+        }
+    }
 
     private void Awake()
     {

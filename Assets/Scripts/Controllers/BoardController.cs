@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+
 using UnityEngine;
 
 public class BoardController : MonoBehaviour
@@ -156,8 +156,14 @@ public class BoardController : MonoBehaviour
 
             List<Cell> matches = new List<Cell>();
             matches.AddRange(cells1);
-            matches.AddRange(cells2);
-            matches = matches.Distinct().ToList();
+            
+            for(int i=0; i<cells2.Count; i++)
+            {
+                if(!matches.Contains(cells2[i]))
+                {
+                    matches.Add(cells2[i]);
+                }
+            }
 
             if (matches.Count < m_gameSettings.MatchesMin)
             {
@@ -214,7 +220,20 @@ public class BoardController : MonoBehaviour
             listVert.Clear();
         }
 
-        return listHor.Concat(listVert).Distinct().ToList();
+        // Merge lists without LINQ. 
+        // Logic: listHor and listVert both contain 'cell'.
+        // We add all horizontal matches, then add vertical matches ensuring no duplicates (which is just 'cell').
+        
+        List<Cell> result = new List<Cell>(listHor);
+        for (int i = 0; i < listVert.Count; i++)
+        {
+             if (!result.Contains(listVert[i]))
+             {
+                 result.Add(listVert[i]);
+             }
+        }
+
+        return result;
     }
 
     private void CollapseMatches(List<Cell> matches, Cell cellEnd)
