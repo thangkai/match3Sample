@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: gamesettings
   m_EditorClassIdentifier: 
   BoardSizeX: 5
-  BoardSizeY: 7
+  BoardSizeY: 5
   MatchesMin: 3
   LevelMoves: 16
   LevelTime: 30
+  TimeForHint: 5
