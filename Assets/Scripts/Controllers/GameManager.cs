@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IGameManager
 {
     public event Action<eStateGame> StateChangedAction = delegate { };
 
@@ -37,13 +37,10 @@ public class GameManager : MonoBehaviour
 
 
     private GameSettings m_gameSettings;
-
-
     private BoardController m_boardController;
-
     private UIMainManager m_uiMenu;
-
     private LevelCondition m_levelCondition;
+    private IItemFactory m_itemFactory;
 
     private void Awake()
     {
@@ -54,7 +51,7 @@ public class GameManager : MonoBehaviour
         m_uiMenu = FindObjectOfType<UIMainManager>();
         m_uiMenu.Setup(this);
 
-        this.gameObject.AddComponent<ItemFactory>();
+        m_itemFactory = this.gameObject.AddComponent<ItemFactory>();
     }
 
     void Start()
@@ -69,7 +66,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    internal void SetState(eStateGame state)
+    public void SetState(eStateGame state)
     {
         State = state;
 
@@ -86,7 +83,7 @@ public class GameManager : MonoBehaviour
     public void LoadLevel(eLevelMode mode)
     {
         m_boardController = new GameObject("BoardController").AddComponent<BoardController>();
-        m_boardController.StartGame(this, m_gameSettings);
+        m_boardController.StartGame(this, m_gameSettings, m_itemFactory);
 
         if (mode == eLevelMode.MOVES)
         {
@@ -109,7 +106,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(WaitBoardController());
     }
 
-    internal void ClearLevel()
+    public void ClearLevel()
     {
         if (m_boardController)
         {

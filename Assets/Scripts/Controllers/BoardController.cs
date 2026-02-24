@@ -11,44 +11,40 @@ public class BoardController : MonoBehaviour
 
     public bool IsBusy { get; private set; }
 
-    private Board m_board;
-
-    private GameManager m_gameManager;
+    private IBoard m_board;
+    private IGameManager m_gameManager;
+    private IItemFactory m_itemFactory;
+    private MatchFinder m_matchFinder;
+    private BoardProcessor m_boardProcessor;
 
     private bool m_isDragging;
-
     private Camera m_cam;
-
     private Collider2D m_hitCollider;
-
     private GameSettings m_gameSettings;
-
     private List<Cell> m_potentialMatch;
-
     private float m_timeAfterFill;
-
     private bool m_hintIsShown;
-
     private bool m_gameOver;
 
-    public void StartGame(GameManager gameManager, GameSettings gameSettings)
+    public void StartGame(IGameManager gameManager, GameSettings gameSettings, IItemFactory itemFactory)
     {
         m_gameManager = gameManager;
-
         m_gameSettings = gameSettings;
+        m_itemFactory = itemFactory;
 
         m_gameManager.StateChangedAction += OnGameStateChange;
-
         m_cam = Camera.main;
 
         m_board = new Board(this.transform, gameSettings);
+        m_matchFinder = new MatchFinder(m_board, gameSettings.MatchesMin);
+        m_boardProcessor = new BoardProcessor(m_board, m_itemFactory, m_matchFinder, this.transform);
 
         Fill();
     }
 
     private void Fill()
     {
-        m_board.Fill();
+        m_boardProcessor.Fill();
         FindMatchesAndCollapse();
     }
 
@@ -68,7 +64,6 @@ public class BoardController : MonoBehaviour
                 break;
         }
     }
-
 
     public void Update()
     {
@@ -175,7 +170,6 @@ public class BoardController : MonoBehaviour
             else
             {
                 OnMoveEvent();
-
                 CollapseMatches(matches, cell2);
             }
         }
@@ -183,7 +177,7 @@ public class BoardController : MonoBehaviour
 
     private void FindMatchesAndCollapse()
     {
-        List<Cell> matches = m_board.FindFirstMatch();
+        List<Cell> matches = m_matchFinder.FindFirstMatch();
 
         if (matches.Count > 0)
         {
@@ -191,16 +185,14 @@ public class BoardController : MonoBehaviour
         }
         else
         {
-            m_potentialMatch = m_board.GetPotentialMatches();
+            m_potentialMatch = m_matchFinder.GetPotentialMatches();
             if (m_potentialMatch.Count > 0)
             {
                 IsBusy = false;
-
                 m_timeAfterFill = 0f;
             }
             else
             {
-                //StartCoroutine(RefillBoardCoroutine());
                 StartCoroutine(ShuffleBoardCoroutine());
             }
         }
@@ -208,29 +200,16 @@ public class BoardController : MonoBehaviour
 
     private List<Cell> GetMatches(Cell cell)
     {
-        List<Cell> listHor = m_board.GetHorizontalMatches(cell);
-        if (listHor.Count < m_gameSettings.MatchesMin)
-        {
-            listHor.Clear();
-        }
+        List<Cell> listHor = m_matchFinder.GetHorizontalMatches(cell);
+        if (listHor.Count < m_gameSettings.MatchesMin) listHor.Clear();
 
-        List<Cell> listVert = m_board.GetVerticalMatches(cell);
-        if (listVert.Count < m_gameSettings.MatchesMin)
-        {
-            listVert.Clear();
-        }
-
-        // Merge lists without LINQ. 
-        // Logic: listHor and listVert both contain 'cell'.
-        // We add all horizontal matches, then add vertical matches ensuring no duplicates (which is just 'cell').
+        List<Cell> listVert = m_matchFinder.GetVerticalMatches(cell);
+        if (listVert.Count < m_gameSettings.MatchesMin) listVert.Clear();
         
         List<Cell> result = new List<Cell>(listHor);
         for (int i = 0; i < listVert.Count; i++)
         {
-             if (!result.Contains(listVert[i]))
-             {
-                 result.Add(listVert[i]);
-             }
+             if (!result.Contains(listVert[i])) result.Add(listVert[i]);
         }
 
         return result;
@@ -245,7 +224,7 @@ public class BoardController : MonoBehaviour
 
         if(matches.Count > m_gameSettings.MatchesMin)
         {
-            m_board.ConvertNormalToBonus(matches, cellEnd);
+            m_boardProcessor.ConvertNormalToBonus(matches, cellEnd);
         }
 
         StartCoroutine(ShiftDownItemsCoroutine());
@@ -253,39 +232,19 @@ public class BoardController : MonoBehaviour
 
     private IEnumerator ShiftDownItemsCoroutine()
     {
-        m_board.ShiftDownItems();
-
+        m_boardProcessor.ShiftDownItems();
         yield return new WaitForSeconds(0.2f);
-
-        m_board.FillGapsWithNewItems();
-
+        m_boardProcessor.FillGapsWithNewItems();
         yield return new WaitForSeconds(0.2f);
-
-        FindMatchesAndCollapse();
-    }
-
-    private IEnumerator RefillBoardCoroutine()
-    {
-        m_board.ExplodeAllItems();
-
-        yield return new WaitForSeconds(0.2f);
-
-        m_board.Fill();
-
-        yield return new WaitForSeconds(0.2f);
-
         FindMatchesAndCollapse();
     }
 
     private IEnumerator ShuffleBoardCoroutine()
     {
-        m_board.Shuffle();
-
+        m_boardProcessor.Shuffle();
         yield return new WaitForSeconds(0.3f);
-
         FindMatchesAndCollapse();
     }
-
 
     private void SetSortingLayer(Cell cell1, Cell cell2)
     {
@@ -306,20 +265,13 @@ public class BoardController : MonoBehaviour
     private void ShowHint()
     {
         m_hintIsShown = true;
-        foreach (var cell in m_potentialMatch)
-        {
-            cell.AnimateItemForHint();
-        }
+        foreach (var cell in m_potentialMatch) cell.AnimateItemForHint();
     }
 
     private void StopHints()
     {
         m_hintIsShown = false;
-        foreach (var cell in m_potentialMatch)
-        {
-            cell.StopHintAnimation();
-        }
-
+        foreach (var cell in m_potentialMatch) cell.StopHintAnimation();
         m_potentialMatch.Clear();
     }
 }

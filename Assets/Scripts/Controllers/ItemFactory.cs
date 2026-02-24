@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemFactory : MonoBehaviour
+public class ItemFactory : MonoBehaviour, IItemFactory
 {
-    public static ItemFactory Instance { get; private set; }
+    private static ItemFactory m_instance;
+    public static ItemFactory Instance => m_instance;
 
     private Dictionary<string, GameObject> m_prefabsDict = new Dictionary<string, GameObject>();
     private Dictionary<string, Queue<Item>> m_pools = new Dictionary<string, Queue<Item>>();
@@ -13,9 +14,9 @@ public class ItemFactory : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
+        if (m_instance == null)
         {
-            Instance = this;
+            m_instance = this;
             InitializeFactory();
         }
         else
@@ -92,6 +93,7 @@ public class ItemFactory : MonoBehaviour
         }
 
         item.OnGetFromPool();
+        item.OnDestroyedCallback = () => ReturnItem(item);
         return item;
     }
 
@@ -103,13 +105,12 @@ public class ItemFactory : MonoBehaviour
         
         if (m_pools.ContainsKey(item.PrefabPath))
         {
-            item.View.SetParent(m_poolContainer);
+            if (item.View) item.View.SetParent(m_poolContainer);
             m_pools[item.PrefabPath].Enqueue(item);
         }
         else
         {
-            // Should not happen if logic is correct
-            GameObject.Destroy(item.View.gameObject);
+            if (item.View) GameObject.Destroy(item.View.gameObject);
         }
     }
 

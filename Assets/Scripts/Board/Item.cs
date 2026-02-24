@@ -84,6 +84,8 @@ public class Item
         return false;
     }
 
+    public Action OnDestroyedCallback;
+
     internal virtual void ExplodeView()
     {
         if (View)
@@ -91,7 +93,7 @@ public class Item
             View.DOScale(0.1f, 0.1f).OnComplete(
                 () =>
                 {
-                    ItemFactory.Instance.ReturnItem(this);
+                    OnDestroyedCallback?.Invoke();
                 }
                 );
         }
@@ -117,7 +119,7 @@ public class Item
     internal void Clear()
     {
         Cell = null;
-        ItemFactory.Instance.ReturnItem(this);
+        OnDestroyedCallback?.Invoke();
     }
 
     public virtual void OnGetFromPool()
