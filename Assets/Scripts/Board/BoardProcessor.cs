@@ -8,7 +8,13 @@ public class BoardProcessor
     private IItemFactory m_itemFactory;
     private MatchFinder m_matchFinder;
     private Transform m_root;
-
+    /// <summary>
+    /// Dependency Injection.
+    /// </summary>
+    /// <param name="board">Interface đại diện cho board. (lấy cell + biết kích thước board ) </param>
+    /// <param name="itemFactory">Factory pattern tạo item: </param>
+    /// <param name="matchFinder"> Class tìm match. </param>
+    /// <param name="root">Parent chứa toàn bộ item view trong scene. </param>
     public BoardProcessor(IBoard board, IItemFactory itemFactory, MatchFinder matchFinder, Transform root)
     {
         m_board = board;
@@ -37,17 +43,22 @@ public class BoardProcessor
                     NormalItem nitem = cell.NeighbourLeft.Item as NormalItem;
                     if (nitem != null) types.Add(nitem.ItemType);
                 }
-
+            
                 var type = Utils.GetRandomNormalTypeExcept(types.ToArray());
+                //Không tạo 3 item giống nhau liên tiếp.
                 NormalItem item = m_itemFactory.GetNormalItem(type);
                 item.SetType(type);
                 item.SetViewRoot(m_root);
-
+                
+                //Gán vào cell
                 cell.Assign(item);
                 cell.ApplyItemPosition(false);
             }
         }
     }
+    /// <summary>
+    /// Trộn lại toàn bộ board.
+    /// </summary>
 
     public void Shuffle()
     {
@@ -61,7 +72,7 @@ public class BoardProcessor
                 cell.Free();
             }
         }
-
+        //Fisher-Yates
         for (int x = 0; x < m_board.BoardSizeX; x++)
         {
             for (int y = 0; y < m_board.BoardSizeY; y++)
@@ -75,6 +86,9 @@ public class BoardProcessor
         }
     }
 
+    /// <summary>
+    /// Sinh item mới vào ô trống.
+    /// </summary>
     public void FillGapsWithNewItems()
     {
         for (int x = 0; x < m_board.BoardSizeX; x++)
@@ -94,6 +108,9 @@ public class BoardProcessor
             }
         }
     }
+    /// <summary>
+    /// Nếu có ô trống bên dưới → item phía trên rơi xuống.
+    /// </summary>
 
     public void ShiftDownItems()
     {
@@ -121,7 +138,18 @@ public class BoardProcessor
             }
         }
     }
+    /// <summary>
+    ///Gọi explode từng cell.
 
+    ///Có thể dùng khi:
+
+    /// bomb toàn màn
+
+    ///reset level
+
+    ///   skill đặc biệt
+    /// 
+    /// </summary>
     public void ExplodeAllItems()
     {
         for (int x = 0; x < m_board.BoardSizeX; x++)
@@ -133,6 +161,11 @@ public class BoardProcessor
         }
     }
 
+    /// <summary>
+    /// Biến match thành bonus item.
+    /// </summary>
+    /// <param name="matches">xác định hướng match</param>
+    /// <param name="cellToConvert"></param>
     public void ConvertNormalToBonus(List<Cell> matches, Cell cellToConvert)
     {
         Board.eMatchDirection dir = m_matchFinder.GetMatchDirection(matches);
@@ -147,6 +180,7 @@ public class BoardProcessor
 
         if (bonusType != BonusItem.eBonusType.NONE)
         {
+            //tạo bonus item
             BonusItem item = m_itemFactory.GetBonusItem(bonusType);
             item.SetType(bonusType);
             item.SetViewRoot(m_root);
@@ -157,6 +191,7 @@ public class BoardProcessor
                 cellToConvert = matches[rnd];
             }
 
+            //Replace item
             cellToConvert.Free();
             cellToConvert.Assign(item);
             cellToConvert.ApplyItemPosition(true);
