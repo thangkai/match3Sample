@@ -83,6 +83,11 @@ public class MatchFinder
 
         return list;
     }
+    /// <summary>
+    /// directtion item
+    /// </summary>
+    /// <param name="matches">list cell check</param>
+    /// <returns></returns>
 
     public Board.eMatchDirection GetMatchDirection(List<Cell> matches)
     {
@@ -112,6 +117,14 @@ public class MatchFinder
         return Board.eMatchDirection.NONE;
     }
 
+    /// <summary>
+    /// Tìm chuỗi match đầu tiên trên board (>= số lượng tối thiểu).
+    /// kiểm tra board hợp lệ
+    /// sau refill
+    /// sau swap
+    
+    /// </summary>
+    /// <returns></returns>
     public List<Cell> FindFirstMatch()
     {
         List<Cell> list = new List<Cell>();
@@ -141,6 +154,10 @@ public class MatchFinder
         return list;
     }
 
+    /// <summary>
+    /// Tìm nước đi có thể tạo match
+    /// </summary>
+    /// <returns></returns>
     public List<Cell> GetPotentialMatches()
     {
         List<Cell> result = new List<Cell>();
@@ -250,6 +267,12 @@ public class MatchFinder
         return null;
     }
 
+    /// <summary>
+    /// Tìm viên thứ 3 xung quanh vị trí target.
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="main"></param>
+    /// <returns></returns>
     private Cell LookForTheThirdCell(Cell target, Cell main)
     {
         if (target == null || target.IsSameType(main)) return null;

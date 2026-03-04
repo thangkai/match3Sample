@@ -31,7 +31,7 @@ public class BoardProcessor
             {
                 Cell cell = m_board.GetCell(x, y);
 
-                List<NormalItem.eNormalType> types = new List<NormalItem.eNormalType>();
+                List<NormalItem.eNormalType> types = new List<NormalItem.eNormalType>();// can tranh
                 if (cell.NeighbourBottom != null)
                 {
                     NormalItem nitem = cell.NeighbourBottom.Item as NormalItem;

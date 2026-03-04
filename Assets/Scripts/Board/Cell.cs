@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Cell : MonoBehaviour
 {
@@ -17,7 +16,10 @@ public class Cell : MonoBehaviour
 
     public Cell NeighbourLeft { get; set; }
 
-
+    //public int BoardSizeX
+    // {
+    //     get { return boardSizeX; }
+    // }
     public bool IsEmpty => Item == null;
 
     public void Setup(int cellX, int cellY)

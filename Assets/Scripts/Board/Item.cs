@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using DG.Tweening;
 
@@ -71,13 +70,13 @@ public class Item
     }
 
     internal void ShowAppearAnimation()
-    {
-        if (View == null) return;
-
-        Vector3 scale = Vector3.one; // Assume default scale is one
-        View.localScale = Vector3.one * 0.1f;
-        View.DOScale(scale, 0.1f);
-    }
+         {
+             if (View == null) return;
+     
+             Vector3 scale = Vector3.one; // Assume default scale is one
+             View.localScale = Vector3.one * 0.1f;
+             View.DOScale(scale, 0.1f);
+         }
 
     internal virtual bool IsSameType(Item other)
     {
