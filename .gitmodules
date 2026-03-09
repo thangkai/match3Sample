@@ -1,0 +1,3 @@
+[submodule "Packages/SubmoduleExample"]
+	path = Packages/SubmoduleExample
+	url = https://github.com/thangkai/testsubmoudleVerStudy.git
