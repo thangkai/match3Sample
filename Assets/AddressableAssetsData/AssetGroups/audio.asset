@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: audio
+  m_EditorClassIdentifier: 
+  m_GroupName: audio
+  m_Data:
+    m_SerializedData: []
+  m_GUID: debebce3a3f5c0d41a6ee0679e57e69d
+  m_SerializeEntries:
+  - m_GUID: 10bf07ee53973b146bb48ef518b6cb4d
+    m_Address: Assets/Sound/dog_bark.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 87690f46234035c41aa210aa8a503d94
+    m_Address: Assets/Sound/gameplay2.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: e1a5a3b499d67134a89ebc99888c4972, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 2eb01d6fdaafb0a4c98a428dc47f9d69, type: 2}
+    - {fileID: 11400000, guid: deb7cc70e0f4e7448bb2a6fe99dc8f9d, type: 2}

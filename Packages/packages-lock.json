@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.company.sdk": {
+      "version": "https://github.com/thangkai/com.company.sdk.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "1361e19eb31e868e468e90a660a2b552b4a8d22f"
+    },
     "com.cysharp.unitask": {
       "version": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
       "depth": 0,
@@ -89,7 +96,7 @@
     },
     "com.unity.nuget.newtonsoft-json": {
       "version": "3.2.1",
-      "depth": 3,
+      "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -134,7 +141,7 @@
     },
     "com.unity.test-framework": {
       "version": "1.1.33",
-      "depth": 1,
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.ext.nunit": "1.0.6",
